@@ -32,7 +32,7 @@ def load_data():
     
     # Parse Event Start Timestamp to datetime (handling UTC format with 'Z')
     if 'Event Start Timestamp' in df.columns:
-        df['Event Start Timestamp'] = pd.to_datetime(df['Event Start Timestamp'], utc=True) - timedelta(hours=2)
+        df['Event Start Timestamp'] = pd.to_datetime(df['Event Start Timestamp'], utc=True)
     
     return df
 
