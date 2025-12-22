@@ -21,7 +21,13 @@ def load_data():
     df = pd.read_csv(f"data/afcon_fantasy_market_{round}_with_league_ownership.csv")
     # Convert percentage columns to numeric, handling empty strings
     percentage_cols = ['League Own %', 'League Start %', 'League Cpt %']
-    df = df.fillna(0)
+    for col in percentage_cols:
+        df[col] = df[col].fillna(0)
+        df[col] = df[col].round(2)
+    # Multiply by 100 to convert from decimal to percentage
+    for col in percentage_cols:
+        df[col] = df[col] * 100
+    
     return df
 
 df = load_data()
@@ -49,40 +55,40 @@ col1, col2, col3, col4 = st.columns(4)
 col1.metric("Total Players", len(filtered_df))
 col2.metric("Unique Teams", filtered_df['Team'].nunique())
 col3.metric("Unique Positions", filtered_df['Pos'].nunique())
-col4.metric("Avg League Own %", f"{filtered_df['League Own %'].mean():.1%}")
+col4.metric("Avg League Own %", f"{filtered_df['League Own %'].mean():.1f}%")
 
 st.markdown("---")
 
 # Configure column display
 column_config = {
     "Player": st.column_config.TextColumn("Player", width="medium"),
-    "Player Image": st.column_config.ImageColumn("Player", width="small"),
+    "Player Image": st.column_config.ImageColumn("Player Image", width="small"),
     "Team": st.column_config.TextColumn("Team", width="small"),
-    "Team Image": st.column_config.ImageColumn("Team", width="small"),
+    "Team Image": st.column_config.ImageColumn("Team Image", width="small"),
     "Pos": st.column_config.TextColumn("Position", width="small"),
     "Total Points": st.column_config.NumberColumn("Total Points", format="%.1f"),
     "Round Points": st.column_config.NumberColumn("Round Points", format="%.1f"),
     "Global Own %": st.column_config.NumberColumn("Global Own %", format="%.1f%%"),
-    "League Own %": st.column_config.NumberColumn("League Own %", format="%.1%"),
-    "League Start %": st.column_config.NumberColumn("League Start %", format="%.1%"),
-    "League Cpt %": st.column_config.NumberColumn("League Cpt %", format="%.1%"),
+    "League Own %": st.column_config.NumberColumn("League Own %", format="%.1f%%"),
+    "League Start %": st.column_config.NumberColumn("League Start %", format="%.1f%%"),
+    "League Cpt %": st.column_config.NumberColumn("League Cpt %", format="%.1f%%"),
 }
+
+# Prepare dataframe for display
+display_df = filtered_df.copy()
 
 # Create a styled dataframe with color formatting
 def color_percentage(val):
-    """Color code percentage values"""
-    if pd.isna(val):
+    """Color code percentage values (now in 0-100 range)"""
+    if pd.isna(val) or val == 0:
         return 'background-color: #f0f0f0'
-    # Green for high values, yellow for medium, red for low
-    if val >= 0.5:
+    # Green for high values (>=50%), yellow for medium (25-50%), pink for low (<25%)
+    if val >= 50:
         return 'background-color: #90EE90'  # Light green
-    elif val >= 0.25:
+    elif val >= 25:
         return 'background-color: #FFE4B5'  # Light yellow
     else:
         return 'background-color: #FFB6C1'  # Light pink
-
-# Prepare dataframe for display (exclude image URLs from styling)
-display_df = filtered_df.copy()
 
 # Apply color formatting to percentage columns
 styled_df = display_df.style.applymap(
@@ -91,6 +97,7 @@ styled_df = display_df.style.applymap(
 )
 
 # Display the dataframe
+# Try with column_config first (for images), fallback to styled if needed
 st.dataframe(
     styled_df,
     column_config=column_config,
