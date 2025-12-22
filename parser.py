@@ -29,6 +29,7 @@ def normalize_player_entry(entry: Dict[str, Any]) -> Dict[str, Any]:
     next_start_ts = next_fixture.get("eventStartTimestamp")
     next_fixture_team = next_fixture.get("team") or {}
 
+
     return {
         "player_id": player.get("id"),
         "name": player.get("name"),
@@ -40,7 +41,7 @@ def normalize_player_entry(entry: Dict[str, Any]) -> Dict[str, Any]:
         "expected_points": entry.get("expectedPoints"),
         "average_score": fantasy.get("averageScore", None),
         "average_score_rank": fantasy.get("averageScoreRank"),
-        "total_points": fantasy.get("totalScore") or fantasy.get("totalPoints"),
+        "total_points": fantasy.get("totalScore"),
         "total_points_rank": fantasy.get("totalScoreRank"),
         "form": fantasy.get("form"),
         "form_rank": fantasy.get("formRank"),
@@ -79,11 +80,17 @@ def normalize_market(players: Iterable[Dict[str, Any]]) -> pd.DataFrame:
 def main(round_id: int) -> None:
     
 
-    import json
-    with open(f"round{round_id}.json", "r") as f:
-        players = json.load(f)
+    url = "https://www.sofascore.com/api/v1/fantasy/round/803/players?resultsPerPage=800"
 
-    players = players["players"]
+    response = requests.get(url)
+
+    players = response.json()["players"]
+
+    # import json
+    # with open(f"round{round_id}.json", "r") as f:
+    #     players = json.load(f)
+
+    # players = players["players"]
 
     try:
         df = normalize_market(players)
@@ -93,7 +100,6 @@ def main(round_id: int) -> None:
     if df.empty:
         raise SystemExit("No players left after applying filters.")
 
-    print(df.iloc[0])
     df = df.sort_values(by=["price", "average_score", "owned_percentage", "form", "total_points", "expected_points"], ascending=False)
 
     csv_path: Path = "data/afcon_fantasy_market"
