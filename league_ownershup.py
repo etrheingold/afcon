@@ -91,12 +91,8 @@ round_players['league_start_pct'] = round_players['player_id'].map(player_starte
 round_players['league_cpt_pct'] = round_players['player_id'].map(player_captains_counts) / len(participants)
 round_players.to_csv(f'afcon_fantasy_market_{round}_with_league_ownership.csv', index=False)
 
-edited_df = round_players[['name', 'player_id','team', 'team_id','position', 'total_points', 'total_points', 'owned_percentage', 'league_own_pct', 'league_start_pct', 'league_cpt_pct']]
-edited_df.columns = ['Player', 'Player Image', 'Team', 'Team Image', 'Pos', 'Total Points', 'Round Points', 'Global Own %', 'League Own %', 'League Start %', 'League Cpt %']
-
-edited_df['Player Image'] = "https://img.sofascore.com/api/v1/player/" + edited_df['Player Image'].astype(str) + "/image"
-edited_df['Team Image'] = "https://img.sofascore.com/api/v1/team/" + edited_df['Team Image'].astype(str) + "/image"
-
+edited_df = round_players[['name','team','position', 'total_points', 'total_points', 'owned_percentage', 'league_own_pct', 'league_start_pct', 'league_cpt_pct']]
+edited_df.columns = ['Player', 'Team', 'Pos', 'Total Points', 'Round Points', 'Global Own %', 'League Own %', 'League Start %', 'League Cpt %']
 
 edited_df = edited_df.sort_values(by=['League Own %', 'League Start %', 'League Cpt %', 'Global Own %'], ascending=[False, False, False, False])
 
