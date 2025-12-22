@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import seaborn as sns
 
 # Page configuration
 st.set_page_config(
@@ -77,23 +78,13 @@ column_config = {
 # Prepare dataframe for display
 display_df = filtered_df.copy()
 
-# Create a styled dataframe with color formatting
-def color_percentage(val):
-    """Color code percentage values (now in 0-100 range)"""
-    if pd.isna(val) or val == 0:
-        return 'background-color: #f0f0f0'
-    # Green for high values (>=50%), yellow for medium (25-50%), pink for low (<25%)
-    if val >= 50:
-        return 'background-color: #90EE90'  # Light green
-    elif val >= 25:
-        return 'background-color: #FFE4B5'  # Light yellow
-    else:
-        return 'background-color: #FFB6C1'  # Light pink
+# Create color map for gradient
+cm2 = sns.diverging_palette(0, 125, s=60, l=85, as_cmap=True)
 
-# Apply color formatting to percentage columns
-styled_df = display_df.style.applymap(
-    color_percentage,
-    subset=['League Own %', 'League Start %', 'League Cpt %']
+# Apply background gradient to percentage columns
+styled_df = display_df.style.background_gradient(
+    cmap=cm2,
+    subset=['Global Own %', 'League Own %', 'League Start %', 'League Cpt %']
 )
 
 # Display the dataframe
