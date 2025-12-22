@@ -57,8 +57,8 @@ col1.metric("Total Players", len(filtered_df))
 col2.metric("Unique Teams", filtered_df['Team'].nunique())
 col3.metric("Unique Positions", filtered_df['Pos'].nunique())
 col4.metric("Players Owned", filtered_df[filtered_df['League Owners'].notna()]['Player'].nunique())
-col5.metric("Total Lge Own %", filtered_df[filtered_df['League Owners'].notna()]['League Own %'].sum()).round(2)
-col6.metric("Total Global Own %", filtered_df['Global Own %'].sum()).round(2)
+col5.metric("Total Lge Own %", filtered_df[filtered_df['League Owners'].notna()]['League Own %'].sum().round(2))
+col6.metric("Total Global Own %", filtered_df['Global Own %'].sum().round(2))
 
 st.markdown("---")
 
