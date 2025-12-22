@@ -113,8 +113,18 @@ st.markdown("---")
 st.caption(f"Showing {len(filtered_df)} of {len(df)} players")
 
 # Add this to test
-st.markdown(
-    '<img src="https://img.sofascore.com/api/v1/player/914309/image" width="100" alt="Player Image">',
-    unsafe_allow_html=True
-)
+st.image("https://img.sofascore.com/api/v1/player/914309/image")
 
+import requests
+
+url = "https://img.sofascore.com/api/v1/player/914309/image"
+try:
+    response = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'})
+    st.write(f"Status Code: {response.status_code}")
+    st.write(f"Content Type: {response.headers.get('Content-Type')}")
+    st.write(f"URL accessible: {response.status_code == 200}")
+    if response.status_code == 200:
+        img = Image.open(BytesIO(response.content))
+        st.image(img)
+except Exception as e:
+    st.error(f"Error: {str(e)}")
