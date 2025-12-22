@@ -54,19 +54,26 @@ for index, row in participants.iterrows():
 player_team_counts = {}
 player_starters_counts = {}
 player_captains_counts = {}
+player_owners = {}
 
 for team_id, team_data in team_info.items():
+    print(team_data["starters"])
     for starter in team_data["starters"]:
         if starter in player_team_counts:
             player_team_counts[starter] += 1
+            player_owners[starter].append(team_data["team_name"])
         else:
             player_team_counts[starter] = 1
+            player_owners[starter] = [team_data["team_name"]]
+            
 
     for substitute in team_data["substitutes"]:
         if substitute in player_team_counts:
             player_team_counts[substitute] += 1
+            player_owners[substitute].append(team_data["team_name"])
         else:
             player_team_counts[substitute] = 1
+            player_owners[substitute] = [team_data["team_name"]]
 
     for starter in team_data["starters"]:
         if starter in player_starters_counts:
@@ -79,6 +86,9 @@ for team_id, team_data in team_info.items():
     else:
         player_captains_counts[team_data["captain"]] = 1
 
+# print(player_team_counts['982615'])
+
+# print(player_owners[1156353])
 
 sorted_player_team_counts_list = sorted(player_team_counts.items(), key=lambda x: x[1], reverse=True)
 sorted_player_team_counts_df = pd.DataFrame(sorted_player_team_counts_list, columns=["player_id", "team_count"])
@@ -90,8 +100,12 @@ round_players['league_own_pct'] = round_players['player_id'].map(sorted_player_t
 round_players['league_start_pct'] = round_players['player_id'].map(player_starters_counts) / len(participants)
 round_players['league_cpt_pct'] = round_players['player_id'].map(player_captains_counts) / len(participants)
 
-edited_df = round_players[['name','team','position', 'total_points', 'total_points', 'owned_percentage', 'league_own_pct', 'league_start_pct', 'league_cpt_pct']]
-edited_df.columns = ['Player', 'Team', 'Pos', 'Total Points', 'Round Points', 'Global Own %', 'League Own %', 'League Start %', 'League Cpt %']
+round_players['league_owners'] = round_players['player_id'].map(player_owners)
+
+edited_df = round_players[['name','team','position', 'total_points', 'total_points', 'owned_percentage', 'league_own_pct', 'league_start_pct', 'league_cpt_pct', 'league_owners']]
+edited_df.columns = ['Player', 'Team', 'Pos', 'Total Points', 'Round Points', 'Global Own %', 'League Own %', 'League Start %', 'League Cpt %', 'League Owners']
+
+
 
 edited_df = edited_df.sort_values(by=['League Own %', 'League Start %', 'League Cpt %', 'Global Own %'], ascending=[False, False, False, False])
 
