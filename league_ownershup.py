@@ -89,7 +89,6 @@ round_players = pd.read_csv(f'data/afcon_fantasy_market_{round}.csv')
 round_players['league_own_pct'] = round_players['player_id'].map(sorted_player_team_counts_dict) / len(participants)
 round_players['league_start_pct'] = round_players['player_id'].map(player_starters_counts) / len(participants)
 round_players['league_cpt_pct'] = round_players['player_id'].map(player_captains_counts) / len(participants)
-round_players.to_csv(f'afcon_fantasy_market_{round}_with_league_ownership.csv', index=False)
 
 edited_df = round_players[['name','team','position', 'total_points', 'total_points', 'owned_percentage', 'league_own_pct', 'league_start_pct', 'league_cpt_pct']]
 edited_df.columns = ['Player', 'Team', 'Pos', 'Total Points', 'Round Points', 'Global Own %', 'League Own %', 'League Start %', 'League Cpt %']
