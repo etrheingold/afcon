@@ -113,5 +113,8 @@ st.markdown("---")
 st.caption(f"Showing {len(filtered_df)} of {len(df)} players")
 
 # Add this to test
-st.image("https://img.sofascore.com/api/v1/player/914309/image")
+st.markdown(
+    '<img src="https://img.sofascore.com/api/v1/player/914309/image" width="100" alt="Player Image">',
+    unsafe_allow_html=True
+)
 
