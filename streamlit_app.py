@@ -108,23 +108,54 @@ st.dataframe(
     height=600
 )
 
-# Additional info
-st.markdown("---")
-st.caption(f"Showing {len(filtered_df)} of {len(df)} players")
-
-# Add this to test
-st.image("https://img.sofascore.com/api/v1/player/914309/image")
-
 import requests
+from PIL import Image
+from io import BytesIO
+
+st.markdown(
+    '<img src="https://img.sofascore.com/api/v1/player/914309/image" width="100" style="border-radius: 5px;">',
+    unsafe_allow_html=True
+)
 
 url = "https://img.sofascore.com/api/v1/player/914309/image"
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Referer': 'https://www.sofascore.com/',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Connection': 'keep-alive',
+    'Sec-Fetch-Dest': 'image',
+    'Sec-Fetch-Mode': 'no-cors',
+    'Sec-Fetch-Site': 'cross-site'
+}
+
 try:
-    response = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'})
+    response = requests.get(url, headers=headers, timeout=10)
     st.write(f"Status Code: {response.status_code}")
     st.write(f"Content Type: {response.headers.get('Content-Type')}")
-    st.write(f"URL accessible: {response.status_code == 200}")
     if response.status_code == 200:
         img = Image.open(BytesIO(response.content))
         st.image(img)
+    else:
+        st.error(f"Failed with status {response.status_code}")
+except Exception as e:
+    st.error(f"Error: {str(e)}")
+
+session = requests.Session()
+session.headers.update({
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Referer': 'https://www.sofascore.com/',
+    'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8'
+})
+
+url = "https://img.sofascore.com/api/v1/player/914309/image"
+try:
+    response = session.get(url, timeout=10)
+    if response.status_code == 200:
+        img = Image.open(BytesIO(response.content))
+        st.image(img)
+    else:
+        st.error(f"Status: {response.status_code}")
 except Exception as e:
     st.error(f"Error: {str(e)}")
