@@ -43,10 +43,6 @@ selected_position = st.sidebar.selectbox("Position", positions)
 
 only_current_upcoming_game = st.sidebar.checkbox("Only Current Match", value=False)
 
-# Team filter
-teams = ['All'] + sorted(df['Team'].dropna().unique().tolist())
-selected_team = st.sidebar.selectbox("Team", teams)
-
 
 
 # Apply filters
@@ -55,6 +51,11 @@ if selected_position != 'All':
     filtered_df = filtered_df[filtered_df['Pos'] == selected_position]
 if only_current_upcoming_game:
     filtered_df = filtered_df[(filtered_df['Event Start Timestamp'] > (datetime.now().isoformat() - timedelta(hours=2.5))) & (filtered_df['Event Start Timestamp'] < (datetime.now().isoformat() + timedelta(hours=1)))]
+
+# Team filter
+teams = ['All'] + sorted(filtered_df['Team'].dropna().unique().tolist())
+selected_team = st.sidebar.selectbox("Team", teams)
+
 if selected_team != 'All':
     filtered_df = filtered_df[filtered_df['Team'] == selected_team]
 
