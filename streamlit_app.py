@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import html
 
 # Page configuration
 st.set_page_config(
@@ -59,103 +60,125 @@ col4.metric("Avg League Own %", f"{filtered_df['League Own %'].mean():.1f}%")
 
 st.markdown("---")
 
-# 
-
-# Configure column display
-column_config = {
-    "Player": st.column_config.TextColumn("Player", width="medium"),
-    "Player Image": st.column_config.ImageColumn("Player Image", width="small"),
-    "Team": st.column_config.TextColumn("Team", width="small"),
-    "Team Image": st.column_config.ImageColumn("Team Image", width="small"),
-    "Pos": st.column_config.TextColumn("Position", width="small"),
-    "Total Points": st.column_config.NumberColumn("Total Points", format="%.1f"),
-    "Round Points": st.column_config.NumberColumn("Round Points", format="%.1f"),
-    "Global Own %": st.column_config.NumberColumn("Global Own %", format="%.1f%%"),
-    "League Own %": st.column_config.NumberColumn("League Own %", format="%.1f%%"),
-    "League Start %": st.column_config.NumberColumn("League Start %", format="%.1f%%"),
-    "League Cpt %": st.column_config.NumberColumn("League Cpt %", format="%.1f%%"),
-}
-
-# Prepare dataframe for display
-display_df = filtered_df.copy()
-
-# Create a styled dataframe with color formatting
-def color_percentage(val):
-    """Color code percentage values (now in 0-100 range)"""
+# Function to get color for percentage values
+def get_percentage_color(val):
+    """Get background color for percentage values (0-100 range)"""
     if pd.isna(val) or val == 0:
-        return 'background-color: #f0f0f0'
-    # Green for high values (>=50%), yellow for medium (25-50%), pink for low (<25%)
+        return '#f0f0f0'
     if val >= 50:
-        return 'background-color: #90EE90'  # Light green
+        return '#90EE90'  # Light green
     elif val >= 25:
-        return 'background-color: #FFE4B5'  # Light yellow
+        return '#FFE4B5'  # Light yellow
     else:
-        return 'background-color: #FFB6C1'  # Light pink
+        return '#FFB6C1'  # Light pink
 
-# Apply color formatting to percentage columns
-styled_df = display_df.style.applymap(
-    color_percentage,
-    subset=['League Own %', 'League Start %', 'League Cpt %']
-)
+# Function to create HTML table with images and color formatting
+def create_html_table(df, show_images=True):
+    """Create HTML table with embedded images and color-coded percentage columns"""
+    html = """
+    <style>
+        .dataframe-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        .dataframe-table th {
+            background-color: #f0f2f6;
+            padding: 8px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .dataframe-table td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .dataframe-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        .dataframe-table img {
+            border-radius: 3px;
+            display: block;
+        }
+    </style>
+    <table class="dataframe-table">
+        <thead>
+            <tr>
+    """
+    
+    # Add header row
+    columns_to_show = ['Player', 'Player Image', 'Team', 'Team Image', 'Pos', 
+                       'Total Points', 'Round Points', 'Global Own %', 
+                       'League Own %', 'League Start %', 'League Cpt %']
+    
+    for col in columns_to_show:
+        if col in df.columns:
+            if col in ['Player Image', 'Team Image'] and not show_images:
+                continue
+            html += f"<th>{col}</th>"
+    
+    html += """
+            </tr>
+        </thead>
+        <tbody>
+    """
+    
+    # Add data rows
+    for idx, row in df.iterrows():
+        html += "<tr>"
+        for col in columns_to_show:
+            if col in df.columns:
+                if col in ['Player Image', 'Team Image'] and not show_images:
+                    continue
+                
+                val = row[col]
+                
+                # Handle image columns
+                if col == 'Player Image' or col == 'Team Image':
+                    if show_images and pd.notna(val) and val != '':
+                        img_width = 50 if col == 'Player Image' else 30
+                        html += f'<td><img src="{val}" width="{img_width}" alt="{col}" onerror="this.style.display=\'none\'"></td>'
+                    else:
+                        html += '<td></td>'
+                # Handle percentage columns with color coding
+                elif col in ['League Own %', 'League Start %', 'League Cpt %']:
+                    bg_color = get_percentage_color(val)
+                    formatted_val = f"{val:.1f}%" if pd.notna(val) else ""
+                    html += f'<td style="background-color: {bg_color}">{formatted_val}</td>'
+                # Handle numeric columns
+                elif col in ['Total Points', 'Round Points', 'Global Own %']:
+                    if pd.notna(val) and val != '':
+                        if col == 'Global Own %':
+                            formatted_val = f"{val:.1f}%"
+                        else:
+                            formatted_val = f"{val:.1f}"
+                        html += f'<td>{formatted_val}</td>'
+                    else:
+                        html += '<td></td>'
+                # Handle text columns
+                else:
+                    display_val = html.escape(str(val)) if pd.notna(val) else ""
+                    html += f'<td>{display_val}</td>'
+        
+        html += "</tr>"
+    
+    html += """
+        </tbody>
+    </table>
+    """
+    return html
 
-# Display the dataframe
-# Try with column_config first (for images), fallback to styled if needed
-st.dataframe(
-    filtered_df,
-    column_config=column_config,
-    use_container_width=True,
-    hide_index=True,
-    height=600
-)
+# Add toggle for showing images
+show_images = st.sidebar.checkbox("Show Images", value=True)
 
-import requests
-from PIL import Image
-from io import BytesIO
+# Display the HTML table
+html_table = create_html_table(filtered_df, show_images=show_images)
+st.markdown(html_table, unsafe_allow_html=True)
 
-st.markdown(
-    '<img src="https://img.sofascore.com/api/v1/player/914309/image" width="100" style="border-radius: 5px;">',
-    unsafe_allow_html=True
-)
-
-url = "https://img.sofascore.com/api/v1/player/914309/image"
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Referer': 'https://www.sofascore.com/',
-    'Accept-Encoding': 'gzip, deflate, br',
-    'Connection': 'keep-alive',
-    'Sec-Fetch-Dest': 'image',
-    'Sec-Fetch-Mode': 'no-cors',
-    'Sec-Fetch-Site': 'cross-site'
-}
-
-try:
-    response = requests.get(url, headers=headers, timeout=10)
-    st.write(f"Status Code: {response.status_code}")
-    st.write(f"Content Type: {response.headers.get('Content-Type')}")
-    if response.status_code == 200:
-        img = Image.open(BytesIO(response.content))
-        st.image(img)
-    else:
-        st.error(f"Failed with status {response.status_code}")
-except Exception as e:
-    st.error(f"Error: {str(e)}")
-
-session = requests.Session()
-session.headers.update({
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Referer': 'https://www.sofascore.com/',
-    'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8'
-})
-
-url = "https://img.sofascore.com/api/v1/player/914309/image"
-try:
-    response = session.get(url, timeout=10)
-    if response.status_code == 200:
-        img = Image.open(BytesIO(response.content))
-        st.image(img)
-    else:
-        st.error(f"Status: {response.status_code}")
-except Exception as e:
-    st.error(f"Error: {str(e)}")
+# Additional info
+st.markdown("---")
+st.caption(f"Showing {len(filtered_df)} of {len(df)} players")
