@@ -59,6 +59,8 @@ col4.metric("Avg League Own %", f"{filtered_df['League Own %'].mean():.1f}%")
 
 st.markdown("---")
 
+# 
+
 # Configure column display
 column_config = {
     "Player": st.column_config.TextColumn("Player", width="medium"),
@@ -99,7 +101,7 @@ styled_df = display_df.style.applymap(
 # Display the dataframe
 # Try with column_config first (for images), fallback to styled if needed
 st.dataframe(
-    styled_df,
+    filtered_df,
     column_config=column_config,
     use_container_width=True,
     hide_index=True,
@@ -109,3 +111,7 @@ st.dataframe(
 # Additional info
 st.markdown("---")
 st.caption(f"Showing {len(filtered_df)} of {len(df)} players")
+
+# Add this to test
+st.image("https://img.sofascore.com/api/v1/player/914309/image")
+
