@@ -93,6 +93,7 @@ column_config = {
     "League Start %": st.column_config.NumberColumn("League Start %", format="%.1f%%"),
     "League Cpt %": st.column_config.NumberColumn("League Cpt %", format="%.1f%%"),
     "League Owners": st.column_config.TextColumn("League Owners", width="medium"),
+    "Round Starter": st.column_config.TextColumn("Round Starter", width="small"),
 }
 
 # Prepare dataframe for display
@@ -106,7 +107,7 @@ cm2 = sns.diverging_palette(0, 125, s=60, l=85, as_cmap=True)
 # Apply background gradient to percentage columns
 styled_df = display_df.style.background_gradient(
     cmap=cm2,
-    subset=['Global Own %', 'League Own %', 'League Start %', 'League Cpt %', 'Total Points', 'Round Points']
+    subset=['Global Own %', 'League Own %', 'League Start %', 'League Cpt %', 'Total Points', 'Round Points', 'Round Starter']
 )
 
 # Display the dataframe

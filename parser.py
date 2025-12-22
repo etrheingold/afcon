@@ -53,6 +53,7 @@ def normalize_player_entry(entry: Dict[str, Any]) -> Dict[str, Any]:
         "total_players_on_position": fantasy.get("totalPlayersOnPosition"),
         "has_left_competition": fantasy.get("hasLeftCompetition"),
         "round_player_id": entry.get("roundPlayerId"),
+        "round_starter": not next_fixture.get("substitute", True),
         "fantasy_id": fantasy.get("id") or entry.get("id"),
         "status": fantasy.get("status"),
         "fixture_difficulty": next_fixture.get("fixtureDifficulty"),
