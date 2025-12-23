@@ -57,7 +57,7 @@ if only_current_upcoming_game:
     # Get current UTC time (timestamps are in UTC format)
     now_utc = pd.Timestamp.now(tz='UTC')
     # Filter for events within 2.5 hours before and 1 hour after current time
-    start_time = now_utc - timedelta(hours=2.5)
+    start_time = now_utc - timedelta(hours=2.25)
     end_time = now_utc + timedelta(hours=1)
     filtered_df = filtered_df[(filtered_df['Event Start Timestamp'] > start_time) & (filtered_df['Event Start Timestamp'] < end_time)]
 
