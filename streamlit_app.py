@@ -45,21 +45,26 @@ st.sidebar.header("🔍 Filters")
 positions = ['All'] + sorted(df['Pos'].dropna().unique().tolist())
 selected_position = st.sidebar.selectbox("Position", positions)
 
-only_current_upcoming_game = st.sidebar.checkbox("Only Current Match", value=False)
-
-
+games = ['All', 'Current', 'Remaining']
+selected_games = st.sidebar.selectbox("Games", games)
 
 # Apply filters
 filtered_df = df.copy()
 if selected_position != 'All':
     filtered_df = filtered_df[filtered_df['Pos'] == selected_position]
-if only_current_upcoming_game:
-    # Get current UTC time (timestamps are in UTC format)
+
+if selected_games == 'Current':
     now_utc = pd.Timestamp.now(tz='UTC')
     # Filter for events within 2.5 hours before and 1 hour after current time
     start_time = now_utc - timedelta(hours=2.25)
     end_time = now_utc + timedelta(hours=1)
     filtered_df = filtered_df[(filtered_df['Event Start Timestamp'] > start_time) & (filtered_df['Event Start Timestamp'] < end_time)]
+elif selected_games == 'Remaining':
+    now_utc = pd.Timestamp.now(tz='UTC')
+    # Filter for events within 2.5 hours before and 1 hour after current time
+    start_time = now_utc - timedelta(hours=2.25)
+    filtered_df = filtered_df[(filtered_df['Event Start Timestamp'] > start_time)]
+
 
 # Team filter
 teams = ['All'] + sorted(filtered_df['Team'].dropna().unique().tolist())
