@@ -45,10 +45,9 @@ def normalize_player_entry(entry: Dict[str, Any]) -> Dict[str, Any]:
         "team": team.get("name"),
         "team_id": team.get("id"),
         "price": entry.get("price") or fantasy.get("price"),
-        "expected_points": entry.get("expectedPoints"),
         "average_score": fantasy.get("averageScore", None),
         "average_score_rank": fantasy.get("averageScoreRank"),
-        "total_points": entry.get("score"),
+        "total_points": entry.get("totalScore",entry.get("score")),
         "round_points": next_fixture.get("score"),
         "total_points_rank": fantasy.get("totalScoreRank"),
         "form": fantasy.get("form"),
@@ -109,7 +108,7 @@ def main(round_id: int) -> None:
     if df.empty:
         raise SystemExit("No players left after applying filters.")
 
-    df = df.sort_values(by=["price", "average_score", "owned_percentage", "form", "total_points", "expected_points"], ascending=False)
+    df = df.sort_values(by=["price", "average_score", "owned_percentage", "form", "total_points"], ascending=False)
 
     csv_path: Path = "data/afcon_fantasy_market"
     today = datetime.utcnow().strftime("%Y%m%d")
