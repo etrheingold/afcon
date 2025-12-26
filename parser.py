@@ -9,6 +9,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 import pandas as pd
 import requests
 
+round_id = 2
 
 
 def normalize_player_entry(entry: Dict[str, Any]) -> Dict[str, Any]:
@@ -25,6 +26,8 @@ def normalize_player_entry(entry: Dict[str, Any]) -> Dict[str, Any]:
         [f for f in fixtures if f.get("eventStartTimestamp") is not None],
         key=_ts,
     )
+
+
     next_fixture = fixtures_sorted[0] if fixtures_sorted else (fixtures[0] if fixtures else {})
     next_start_ts = next_fixture.get("eventStartTimestamp")
     next_fixture_team = next_fixture.get("team") or {}
@@ -46,6 +49,7 @@ def normalize_player_entry(entry: Dict[str, Any]) -> Dict[str, Any]:
         "average_score": fantasy.get("averageScore", None),
         "average_score_rank": fantasy.get("averageScoreRank"),
         "total_points": entry.get("score"),
+        "round_points": next_fixture.get("score"),
         "total_points_rank": fantasy.get("totalScoreRank"),
         "form": fantasy.get("form"),
         "form_rank": fantasy.get("formRank"),
@@ -85,7 +89,7 @@ def normalize_market(players: Iterable[Dict[str, Any]]) -> pd.DataFrame:
 def main(round_id: int) -> None:
     
 
-    url = "https://www.sofascore.com/api/v1/fantasy/round/803/players?resultsPerPage=800"
+    url = f"https://www.sofascore.com/api/v1/fantasy/round/{802+round_id}/players?resultsPerPage=800"
 
     response = requests.get(url)
 
