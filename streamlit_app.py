@@ -15,7 +15,7 @@ st.set_page_config(
 st.title("⚽ AFCON Fantasy Data")
 st.markdown("---")
 
-round = 1
+round = 2
 
 # Load data
 @st.cache_data

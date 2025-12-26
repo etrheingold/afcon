@@ -116,5 +116,4 @@ def main(round_id: int) -> None:
     print(df.head(10))
 
 
-if __name__ == "__main__":
-    main(round_id=1)
+main(round_id=2)

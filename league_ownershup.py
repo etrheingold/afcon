@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 import json
 
-round = 1
+round = 2
 
 url = "https://www.sofascore.com/api/v1/fantasy/league/87294/participants?page=0&q="
 
@@ -18,11 +18,11 @@ for index, row in participants.iterrows():
     user_id = row["userId"]
     team_name = row["teamName"]
 
-    url2 = f"https://www.sofascore.com/api/v1/fantasy/user/{user_id}/round/803/squad"
+    url2 = f"https://www.sofascore.com/api/v1/fantasy/user/{user_id}/round/{802+round}/squad"
 
     response2 = requests.get(url2)
 
-    score = response2.json()['userRound']["score"]
+    score = response2.json()['userRound'].get("score", 0)
     name = response2.json()["squad"]["name"]
     players = response2.json()["squad"]["players"]
     starters = []
