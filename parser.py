@@ -118,5 +118,7 @@ def main(round_id: int) -> None:
 
     print(df.head(10))
 
+    print(df.round_starter.value_counts())
+
 
 main(round_id=round_id)
