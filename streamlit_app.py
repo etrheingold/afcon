@@ -121,7 +121,6 @@ styled_df = display_df.style.background_gradient(
 st.dataframe(
     styled_df,
     column_config=column_config,
-    use_container_width=True,
     hide_index=True,
     height=600
 )

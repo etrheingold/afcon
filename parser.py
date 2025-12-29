@@ -47,7 +47,7 @@ def normalize_player_entry(entry: Dict[str, Any]) -> Dict[str, Any]:
         "price": entry.get("price") or fantasy.get("price"),
         "average_score": fantasy.get("averageScore", None),
         "average_score_rank": fantasy.get("averageScoreRank"),
-        "total_points": entry.get("totalScore",entry.get("score")),
+        "total_points": fantasy.get("totalScore",player.get("totalScore")),
         "round_points": next_fixture.get("score"),
         "total_points_rank": fantasy.get("totalScoreRank"),
         "form": fantasy.get("form"),
