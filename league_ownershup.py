@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 import json
 
-round = 2
+round = 3
 
 url = "https://www.sofascore.com/api/v1/fantasy/league/87294/participants?page=0&q="
 

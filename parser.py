@@ -9,7 +9,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 import pandas as pd
 import requests
 
-round_id = 2
+round_id = 3
 
 
 def normalize_player_entry(entry: Dict[str, Any]) -> Dict[str, Any]:
@@ -119,4 +119,4 @@ def main(round_id: int) -> None:
     print(df.head(10))
 
 
-main(round_id=2)
+main(round_id=round_id)
